@@ -1,2 +1,5 @@
 # database
 *.db
+
+# marimo
+__marimo__/
