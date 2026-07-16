@@ -4,6 +4,7 @@
 #     "altair==6.2.2",
 #     "duckdb==1.5.4",
 #     "httpx==0.28.1",
+#     "marimo>=0.23.13",
 #     "pandas==3.0.3",
 #     "polars[pyarrow]==1.42.1",
 #     "ruff==0.15.20",
@@ -62,7 +63,7 @@ def _(engine):
             had_data bool default true
         );
         """,
-        engine=engine,
+        engine=engine
     )
     return
 
@@ -92,7 +93,7 @@ def _(engine):
             (5, 'Atbilžu sniegšana uz deputātu jautājumiem'),
             (6, 'Ārkārtas sesijas sēde');
         """,
-        engine=engine,
+        engine=engine
     )
     return
 
