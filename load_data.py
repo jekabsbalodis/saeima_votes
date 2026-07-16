@@ -7,9 +7,12 @@
 #     "marimo>=0.23.13",
 #     "pandas==3.0.3",
 #     "polars[pyarrow]==1.42.1",
+#     "python-dotenv>=1.2.2",
 #     "ruff==0.15.20",
 #     "sqlglot==30.12.0",
 # ]
+# [tool.marimo.runtime]
+# dotenv = [".env"]
 # ///
 
 import marimo
@@ -23,6 +26,10 @@ with app.setup:
     import pandas as pd
     import duckdb
     import httpx
+    import os
+    from dotenv import load_dotenv
+
+    load_dotenv('.env')
 
 
 @app.cell(hide_code=True)
@@ -63,7 +70,7 @@ def _(engine):
             had_data bool default true
         );
         """,
-        engine=engine
+        engine=engine,
     )
     return
 
@@ -93,7 +100,7 @@ def _(engine):
             (5, 'Atbilžu sniegšana uz deputātu jautājumiem'),
             (6, 'Ārkārtas sesijas sēde');
         """,
-        engine=engine
+        engine=engine,
     )
     return
 
@@ -476,6 +483,109 @@ def _(debate_loaded_df, dkp_loaded_df, engine, vote_loaded_df):
             from
                 loaded_urls_df;
             """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    # Write data to S3 storage
+    ## Create S3 connection in database
+    """)
+    return
+
+
+@app.cell
+def _(engine):
+    _df = mo.sql(
+        f"""
+        install httpfs;
+        load httpfs;
+        """,
+        engine=engine,
+    )
+    return
+
+
+@app.cell
+def _(engine):
+    engine.execute(
+        """
+        create or replace secret (
+           type s3,
+           key_id ?,
+           secret ?,
+           endpoint ?,
+           region ?,
+           url_style 'path'
+         );
+    """,
+        (
+            os.environ.get('GARAGE_KEY_ID'),
+            os.environ.get('GARAGE_KEY_SECRET'),
+            os.environ.get('GARAGE_ENDPOINT'),
+            os.environ.get('GARAGE_REGION'),
+        ),
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Copy tables to S3 storage as parquet files
+    """)
+    return
+
+
+@app.cell
+def _(engine):
+    _df = mo.sql(
+        f"""
+        copy (
+            select
+                *
+            from
+                dim.session_type
+        ) to 's3://saeima-votes/dim.session_type.parquet' (format parquet, overwrite_or_ignore true);
+
+        copy (
+            select
+                *
+            from
+                raw._loaded_urls
+        ) to 's3://saeima-votes/raw._loaded_urls.parquet' (format parquet, overwrite_or_ignore true);
+
+        copy (
+            select
+                *
+            from
+                raw.debate
+        ) to 's3://saeima-votes/raw.debate.parquet' (format parquet, overwrite_or_ignore true);
+
+        copy (
+            select
+                *
+            from
+                raw.dkp
+        ) to 's3://saeima-votes/raw.dkp.parquet' (format parquet, overwrite_or_ignore true);
+
+        copy (
+            select
+                *
+            from
+                raw.dkp_items
+        ) to 's3://saeima-votes/raw.dkp_items.parquet' (format parquet, overwrite_or_ignore true);
+
+        copy (
+            select
+                *
+            from
+                raw.vote
+        ) to 's3://saeima-votes/raw.vote.parquet' (format parquet, overwrite_or_ignore true);
+        """,
+        engine=engine
     )
     return
 
