@@ -32,7 +32,7 @@ df = con.execute("""--sql
 
 df_len = len(df)
 
-st.write(f'## 14.&nbsp;Saiemas sesiju darba kārtības; {df_len} ieraksti')
+st.write(f'## 14.&nbsp;Saeimas sesiju darba kārtības; {df_len} ieraksti')
 
 st.dataframe(df)
 
@@ -41,7 +41,7 @@ df2 = con.execute("""--sql
 
 df2_len = len(df2)
 
-st.write(f'## 14.&nbsp;Saiemas sesiju darba kārtību punkti; {df2_len} ieraksti')
+st.write(f'## 14.&nbsp;Saeimas sesiju darba kārtību punkti; {df2_len} ieraksti')
 
 st.dataframe(df2)
 
@@ -50,7 +50,7 @@ df3 = con.execute("""--sql
 
 df3_len = len(df3)
 
-st.write(f'## 14.&nbsp;Saiemas balsošanas dati; {df3_len} ieraksti')
+st.write(f'## 14.&nbsp;Saeimas balsošanas dati; {df3_len} ieraksti')
 
 st.dataframe(df3)
 
@@ -59,7 +59,7 @@ df4 = con.execute("""--sql
 
 df4_len = len(df4)
 
-st.write(f'## 14.&nbsp;Saiemas debašu dati; {df4_len} ieraksti')
+st.write(f'## 14.&nbsp;Saeimas debašu dati; {df4_len} ieraksti')
 
 st.dataframe(df4)
 
