@@ -1,32 +1,16 @@
-# /// script
-# requires-python = ">=3.14"
-# dependencies = [
-#     "altair==6.2.2",
-#     "duckdb==1.5.4",
-#     "httpx==0.28.1",
-#     "marimo>=0.23.13",
-#     "pandas==3.0.3",
-#     "polars[pyarrow]==1.42.1",
-#     "python-dotenv>=1.2.2",
-#     "ruff==0.15.20",
-#     "sqlglot==30.12.0",
-# ]
-# [tool.marimo.runtime]
-# dotenv = [".env"]
-# ///
-
 import marimo
 
-__generated_with = "0.23.13"
+__generated_with = "0.23.14"
 app = marimo.App()
 
 with app.setup:
-    import marimo as mo
-    import polars as pl
-    import pandas as pd
+    import os
+
     import duckdb
     import httpx
-    import os
+    import marimo as mo
+    import pandas as pd
+    import polars as pl
     from dotenv import load_dotenv
 
     load_dotenv('.env')

@@ -3,11 +3,18 @@ name = "saeima-votes"
 version = "0.1.0"
 description = "Explore Saeima members' voting history"
 readme = "README.md"
-authors = [{ name = "Jēkabs Balodis", email = "signalingpigeon@duck.com" }]
 requires-python = ">=3.14"
+authors = [{ name = "Jēkabs Balodis", email = "signalingpigeon@duck.com" }]
 dependencies = [
+  "altair>=6.2.2",
   "duckdb>=1.5.4",
-  "polars>=1.42.1",
+  "httpx>=0.28.1",
+  "lxml>=6.1.1",
+  "marimo>=0.23.14",
+  "pandas>=3.0.3",
+  "polars[pyarrow]>=1.42.1",
+  "python-dotenv>=1.2.2",
+  "sqlglot>=30.12.0",
   "streamlit>=1.59.1",
 ]
 
@@ -27,6 +34,9 @@ omit = ["tests/*"]
 source = [
   ".",
 ]
+
+[tool.marimo.runtime]
+dotenv = [".env"]
 
 [tool.ruff]
 target-version = "py314"
