@@ -54,7 +54,7 @@ def _(engine):
             had_data bool default true
         );
         """,
-        engine=engine,
+        engine=engine
     )
     return
 
@@ -64,28 +64,6 @@ def _():
     mo.md(r"""
     ## Create schema `dim` and table for `session_type` dimension
     """)
-    return
-
-
-@app.cell
-def _(engine):
-    _df = mo.sql(
-        f"""
-        create schema if not exists dim;
-
-        create table if not exists dim.session_type (id UINT8 PRIMARY key, name VARCHAR);
-
-        insert
-        or ignore into dim.session_type (id, NAME)
-        values
-            (1, 'Kārtējā'),
-            (2, 'Ārkārtas sēde'),
-            (3, 'Svinīgā sēde'),
-            (5, 'Atbilžu sniegšana uz deputātu jautājumiem'),
-            (6, 'Ārkārtas sesijas sēde');
-        """,
-        engine=engine,
-    )
     return
 
 
@@ -487,7 +465,7 @@ def _(engine):
         install httpfs;
         load httpfs;
         """,
-        engine=engine,
+        engine=engine
     )
     return
 
