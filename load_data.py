@@ -509,13 +509,6 @@ def _(engine):
             select
                 *
             from
-                dim.session_type
-        ) to 's3://saeima-votes/dim.session_type.parquet' (format parquet, overwrite_or_ignore true);
-
-        copy (
-            select
-                *
-            from
                 raw._loaded_urls
         ) to 's3://saeima-votes/raw._loaded_urls.parquet' (format parquet, overwrite_or_ignore true);
 
