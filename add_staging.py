@@ -65,7 +65,7 @@ def _(engine, mo):
 def _(engine, mo):
     _df = mo.sql(
         f"""
-        create view if not exists stg.dkp_items as
+        create view if not exists stg.dkp as
         select
             strptime(DATESUBMITED, '%d.%m.%Y')::DATE as date_submitted,
             case DEBATE_FLAG
