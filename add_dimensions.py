@@ -15,8 +15,8 @@ def _():
 def _():
     import duckdb
 
-    DATABASE_URL = "explore_saeima.db"
-    engine = duckdb.connect(DATABASE_URL, read_only=False)
+    _DATABASE_URL = "explore_saeima.db"
+    engine = duckdb.connect(_DATABASE_URL, read_only=False)
     return (engine,)
 
 
@@ -26,16 +26,24 @@ def _(engine, mo):
         f"""
         create schema if not exists dim;
 
-        create table if not exists dim.session_type (id UINT8 PRIMARY key, name VARCHAR);
+        create table if not exists dim.session_type (session_type_id UINT8 PRIMARY key, name VARCHAR);
 
         insert
-        or ignore into dim.session_type (id, NAME)
+        or ignore into dim.session_type (session_type_id, NAME)
         values
             (1, 'Kārtējā'),
             (2, 'Ārkārtas sēde'),
             (3, 'Svinīgā sēde'),
             (5, 'Atbilžu sniegšana uz deputātu jautājumiem'),
             (6, 'Ārkārtas sesijas sēde');
+
+        create table if not exists dim.session_status (session_status_id UINT8 PRIMARY key, name VARCHAR);
+
+        insert
+        or ignore into dim.session_status (session_status_id, NAME)
+        values
+            (6, 'Izskatīta'),
+            (8, 'Atcelta');
         """,
         engine=engine
     )

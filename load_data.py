@@ -109,10 +109,10 @@ def _():
 
 @app.cell
 def _():
-    def read_agenda(url: str) -> pl.DataFrame:
+    def read_dk(url: str) -> pl.DataFrame:
         return pl.from_pandas(pd.read_xml(url, xpath='./DK', dtype=str))
 
-    def read_agenda_items(url: str) -> pl.DataFrame:
+    def read_dkp(url: str) -> pl.DataFrame:
         return pl.from_pandas(pd.read_xml(url, xpath='.//DKP', dtype=str))
 
     def read_votes(url: str) -> pl.DataFrame:
@@ -121,7 +121,7 @@ def _():
     def read_debates(url: str) -> pl.DataFrame:
         return pl.from_pandas(pd.read_xml(url, xpath='.//DEBATES', dtype=str))
 
-    return read_agenda, read_agenda_items, read_debates, read_votes
+    return read_debates, read_dk, read_dkp, read_votes
 
 
 @app.cell(hide_code=True)
@@ -195,9 +195,9 @@ def _(
     engine,
     get_all_resources,
     load_doc_type,
-    read_agenda,
-    read_agenda_items,
     read_debates,
+    read_dk,
+    read_dkp,
     read_votes,
 ):
     _resources = get_all_resources('4f854a14-8861-449d-bb2a-832113734711')
@@ -209,20 +209,20 @@ def _(
         .to_list()
     )
 
-    agendas_df, dkp_loaded_df = load_doc_type(
+    dk_df, dkp_loaded_df = load_doc_type(
         _resources,
         'dkp.xml',
         '14.saeimas',
         'dkp',
-        read_agenda,
+        read_dk,
         _loaded_urls,
     )
-    agenda_items_df, _ = load_doc_type(
+    dkp_df, _ = load_doc_type(
         _resources,
         'dkp.xml',
         '14.saeimas',
         'dkp',
-        read_agenda_items,
+        read_dkp,
         _loaded_urls,
     )
     votes_df, vote_loaded_df = load_doc_type(
@@ -242,10 +242,10 @@ def _(
         _loaded_urls,
     )
     return (
-        agenda_items_df,
-        agendas_df,
         debate_loaded_df,
         debates_df,
+        dk_df,
+        dkp_df,
         dkp_loaded_df,
         vote_loaded_df,
         votes_df,
@@ -262,28 +262,28 @@ def _():
 
 
 @app.cell
-def _(agenda_items_df, agendas_df, debates_df, engine, votes_df):
-    if agendas_df is not None:
+def _(debates_df, dk_df, dkp_df, engine, votes_df):
+    if dk_df is not None:
+        engine.execute(
+            """
+            create table if not exists raw.dk as
+            select
+                *
+            from
+                dk_df
+            where
+                1 = 0;
+            """
+        )
+
+    if dkp_df is not None:
         engine.execute(
             """
             create table if not exists raw.dkp as
             select
                 *
             from
-                agendas_df
-            where
-                1 = 0;
-            """
-        )
-
-    if agenda_items_df is not None:
-        engine.execute(
-            """
-            create table if not exists raw.dkp_items as
-            select
-                *
-            from
-                agenda_items_df
+                dkp_df
             where
                 1 = 0;
             """
@@ -329,16 +329,16 @@ def _():
 def _(engine):
     try:
         engine.execute(
-            """alter table raw.dkp
-            add constraint dkp_pk primary key ("WORKSEQUENCEID");"""
+            """alter table raw.dk
+            add constraint dk_pk primary key ("WORKSEQUENCEID");"""
         )
     except duckdb.CatalogException:
         pass
 
     try:
         engine.execute(
-            """alter table raw.dkp_items
-            add constraint dkp_items_pk primary key ("DKP_ID");"""
+            """alter table raw.dkp
+            add constraint dkp_pk primary key ("DKP_ID");"""
         )
     except duckdb.CatalogException:
         pass
@@ -370,26 +370,26 @@ def _():
 
 
 @app.cell
-def _(agenda_items_df, agendas_df, debates_df, engine, votes_df):
-    if agendas_df is not None:
+def _(debates_df, dk_df, dkp_df, engine, votes_df):
+    if dk_df is not None:
         engine.execute(
             """
-            insert or ignore into raw.dkp 
+            insert or ignore into raw.dk
             select
                 *
             from
-                agendas_df;
+                dk_df;
             """
         )
 
-    if agenda_items_df is not None:
+    if dkp_df is not None:
         engine.execute(
             """
-            insert or ignore into raw.dkp_items
+            insert or ignore into raw.dkp
             select
                 *
             from
-                agenda_items_df;
+                dkp_df;
             """
         )
 
@@ -530,15 +530,15 @@ def _(engine):
             select
                 *
             from
-                raw.dkp
-        ) to 's3://saeima-votes/raw.dkp.parquet' (format parquet, overwrite_or_ignore true);
+                raw.dk
+        ) to 's3://saeima-votes/raw.dk.parquet' (format parquet, overwrite_or_ignore true);
 
         copy (
             select
                 *
             from
-                raw.dkp_items
-        ) to 's3://saeima-votes/raw.dkp_items.parquet' (format parquet, overwrite_or_ignore true);
+                raw.dkp
+        ) to 's3://saeima-votes/raw.dkp.parquet' (format parquet, overwrite_or_ignore true);
 
         copy (
             select
