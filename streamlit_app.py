@@ -28,7 +28,7 @@ con.execute(
 st.write('# Neapstrādāti dati')
 
 df = con.execute("""--sql
-                 select * from read_parquet('s3://saeima-votes/raw.dkp.parquet')""").pl()
+                 select * from read_parquet('s3://saeima-votes/raw.dk.parquet')""").pl()
 
 df_len = len(df)
 
@@ -37,7 +37,7 @@ st.write(f'## 14.&nbsp;Saeimas sesiju darba kārtības; {df_len} ieraksti')
 st.dataframe(df)
 
 df2 = con.execute("""--sql
-                 select * from read_parquet('s3://saeima-votes/raw.dkp_items.parquet')""").pl()
+                 select * from read_parquet('s3://saeima-votes/raw.dkp.parquet')""").pl()
 
 df2_len = len(df2)
 
